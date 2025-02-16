@@ -40,6 +40,17 @@ class Post(models.Model):
         (ARTICLE, 'Article'),
         (NEWS, 'News'),
     ]
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    post_type = models.CharField(
+        max_length=2,
+        choices=POST_TYPES,
+        default=NEWS
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_post_type_display()}: {self.title}"
 
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     post_type = models.CharField(max_length=2, choices=POST_TYPES)
@@ -89,3 +100,34 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.title}"
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+
+    class Meta:
+        permissions = [
+            ("add_post", "Can add post"),
+            ("change_post", "Can change post"),
+            ("delete_post", "Can delete post"),
+        ]
+
+from django.contrib.auth.models import Group, User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def add_user_to_common_group(sender, instance, created, **kwargs):
+    if created:
+        group, _ = Group.objects.get_or_create(name="common")
+        instance.groups.add(group)
+
+from django.contrib.auth.models import User
+from django.db import models
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    subscribers = models.ManyToManyField(User, related_name="subscribed_categories")
+
+    def __str__(self):
+        return self.name

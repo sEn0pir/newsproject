@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Новости</h1>
+<h1>Поиск новостей</h1>
+
+<form method="get">
+    <input type="text" name="title" placeholder="Название" value="{{ request.GET.title }}">
+    <input type="text" name="author" placeholder="Автор" value="{{ request.GET.author }}">
+    <input type="date" name="date_after" value="{{ request.GET.date_after }}">
+    <button type="submit">Искать</button>
+</form>
 
 {% for post in news_list %}
     <div>
@@ -11,7 +18,7 @@
         <p><strong>Дата:</strong> {{ post.created_at }}</p>
     </div>
 {% empty %}
-    <p>Новостей пока нет.</p>
+    <p>Ничего не найдено.</p>
 {% endfor %}
 
 <!-- Пагинация -->
@@ -35,14 +42,3 @@
     {% endif %}
 </div>
 {% endblock %}
-{% for post in news_list %}
-    <div>
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.preview }}</p>
-        <p><strong>Автор:</strong> {{ post.author.user.username }}</p>
-        <p><strong>Дата:</strong> {{ post.created_at }}</p>
-
-        <a href="{% url 'news_edit' post.pk %}">Редактировать</a>
-        <a href="{% url 'news_delete' post.pk %}">Удалить</a>
-    </div>
-{% endfor %}

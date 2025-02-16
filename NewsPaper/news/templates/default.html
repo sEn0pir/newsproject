@@ -8,11 +8,24 @@
 <body>
     <header>
         <h1>News Portal</h1>
+
+        {% if request.user.is_authenticated %}
+            <p>Привет, {{ request.user.username }}!</p>
+            {% if request.user.groups.all.0.name == "common" %}
+                <a href="{% url 'become_author' %}">Стать автором</a>
+            {% endif %}
+            <a href="{% url 'logout' %}">Выйти</a>
+        {% else %}
+            <a href="{% url 'login' %}">Войти</a> |
+            <a href="{% url 'signup' %}">Регистрация</a>
+        {% endif %}
     </header>
+
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
     <footer>
         <p>&copy; 2023 News Portal</p>
     </footer>
